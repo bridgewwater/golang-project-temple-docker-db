@@ -1,0 +1,99 @@
+# copy right
+# Licenses http://www.apache.org/licenses/LICENSE-2.0
+# more info see https://docs.docker.com/compose/compose-file/ or https://docker.github.io/compose/compose-file/
+version: '3.7'
+
+networks:
+  default:
+#volumes:
+#  web-data:
+services:
+  # https://hub.docker.com/r/bitnami/mysql
+  golang-project-temple-docker-db-mysql-fix:
+    container_name: 'golang-project-temple-docker-db-mysql-fix'
+    image: bitnami/mysql:5.7.27
+    user: root
+    command: chown -R 1001:1001 /bitnami/
+    volumes:
+      - ./data/mysql-golang-project-temple-docker-db:/bitnami/
+  # https://hub.docker.com/r/bitnami/mysql
+  golang-project-temple-docker-db-mysql:
+    container_name: 'golang-project-temple-docker-db-mysql'
+    image: bitnami/mysql:5.7.27
+    depends_on:
+      - golang-project-temple-docker-db-mysql-fix
+    ports:
+      - '35011:3306'
+    volumes:
+      - './data/mysql-golang-project-temple-docker-db:/bitnami/mysql/data'
+      - './data/mysql-golang-project-temple-docker-db-conf/my_custom.cnf:/opt/bitnami/mysql/conf/bitnami/my_custom.cnf:ro'
+      - './data/tmp/:/tmp'
+    environment:
+      MYSQL_ROOT_PASSWORD: '3a5f549be630a467'
+      MYSQL_DATABASE: 'GoAdmin'
+      MYSQL_USER: 'golang'
+      MYSQL_PASSWORD: 'golang123456'
+    restart: always # on-failure:3 or unless-stopped always default no
+  # https://hub.docker.com/r/bitnami/redis/
+  golang-project-temple-docker-db-redis-fix: # use https://github.com/bitnami/bitnami-docker-mongodb/issues/103#issuecomment-424833086 fix ubunut error
+    container_name: 'golang-project-temple-docker-db-redis-fix'
+    image: 'bitnami/redis:5.0.0'
+    user: root
+    command: chown -R 1001:1001 /bitnami
+    volumes:
+      - ./data/redis-golang-project-temple-docker-db:/bitnami
+  golang-project-temple-docker-db-redis:
+    container_name: 'golang-project-temple-docker-db-redis'
+    # for fix debian folder error
+    image: 'bitnami/redis:5.0.0'
+    depends_on:
+      - golang-project-temple-docker-db-redis-fix
+    environment:
+      # ALLOW_EMPTY_PASSWORD is recommended only for development.
+      - ALLOW_EMPTY_PASSWORD=yes
+      # - REDIS_REPLICATION_MODE=slave
+      # - REDIS_PASSWORD=[pwd]
+      # - REDIS_MASTER_HOST=[pwd]
+      # - REDIS_MASTER_PORT_NUMBER=[pwd]
+      # - REDIS_MASTER_PASSWORD=[pwd]
+      - REDIS_EXTRA_FLAGS=--maxmemory 300mb
+    ports:
+      - '35021:6379'
+    volumes:
+      - './data/redis-golang-project-temple-docker-db-etc/redis.conf:/opt/bitnami/redis/etc/redis.conf'
+      - './data/redis-golang-project-temple-docker-db/data:/bitnami/redis/data'
+    restart: always # on-failure:3 or unless-stopped always default no
+  golang-project-temple-docker-db:
+    container_name: "${ROOT_NAME}"
+    image: '${ROOT_NAME}:${DIST_TAG}' # see local docker file
+    depends_on:
+      - golang-project-temple-docker-db-mysql
+      - golang-project-temple-docker-db-redis
+    ports:
+      - "35001:${ENV_WEB_PORT}"
+    volumes:
+      - "./data/biz/maintain/:/usr/src/maintain"
+      - "$PWD:/usr/src/myapp"
+    environment:
+      - ENV_WEB_HTTPS_ENABLE=false
+      - ENV_WEB_AUTO_HOST=false
+      - ENV_WEB_HOST=${ENV_WEB_HOST}:${ENV_WEB_PORT} # 0.0.0.0:35001
+      - ENV_WEB_DB_MYSQL_DEFAULT_HOST=golang-project-temple-docker-db-mysql
+      - ENV_WEB_DB_MYSQL_DEFAULT_PORT=3306
+      - ENV_WEB_DB_MYSQL_DEFAULT_DBNAME=GoAdmin
+      - ENV_WEB_DB_MYSQL_DEFAULT_USER=golang
+      - ENV_WEB_DB_MYSQL_DEFAULT_PWD=golang123456
+      - ENV_WEB_CACHE_REDIS_DEFAULT_ADDR=golang-project-temple-docker-db-redis:6379
+      - ENV_WEB_CACHE_REDIS_DEFAULT_PASSWORD=
+      - ENV_WEB_CACHE_REDIS_DEFAULT_DB=0
+    working_dir: "/usr/src/myapp"
+    command:
+      - bash
+      - /usr/src/maintain/wait-for-it.sh
+      - '-t'
+      - '0'
+      - 'golang-project-temple-docker-db-mysql:3306'
+      - '--'
+      - make
+      - dev
+

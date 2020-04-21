@@ -1,0 +1,68 @@
+name: golang-project-temple-docker-db              # name of server
+run_mode: debug                      # run mode: debug, test, release
+addr: :35001                         # HTTP port will cover by env ENV_AUTO_HOST and most in docker use env ENV_WEB_HOST
+ssl_enable: false                    # is enable ssl mode this will cover by env ENV_WEB_HTTPS_ENABLE
+api_version: /v1                     # api version
+
+zap:
+  AtomicLevel: -1 # DebugLevel:-1 InfoLevel:0 WarnLevel:1 ErrorLevel:2
+  FieldsAuto: false # is use auto Fields key set
+  Fields:
+    Key: key
+    Val: val
+  Development: true # is open Open file and line number
+  Encoding: console # output format, only use console or json, default is console
+  rotate:
+    Filename: log/golang-project-temple-docker-db.log # Log file path
+    MaxSize: 16 # Maximum size of each zlog file, Unit: M
+    MaxBackups: 10 # How many backups are saved in the zlog file
+    MaxAge: 7 # How many days can the file be keep, Unit: day
+    Compress: true # need compress
+  EncoderConfig:
+    TimeKey: time
+    LevelKey: level
+    NameKey: logger
+    CallerKey: caller
+    MessageKey: msg
+    StacktraceKey: stacktrace
+    TimeEncoder: ISO8601TimeEncoder # ISO8601TimeEncoder EpochMillisTimeEncoder EpochNanosTimeEncoder EpochTimeEncoder default is ISO8601TimeEncoder
+    EncodeDuration: SecondsDurationEncoder # NanosDurationEncoder SecondsDurationEncoder StringDurationEncoder default is SecondsDurationEncoder
+    EncodeLevel: CapitalColorLevelEncoder # CapitalLevelEncoder CapitalColorLevelEncoder LowercaseColorLevelEncoder LowercaseLevelEncoder default is CapitalLevelEncoder
+    EncodeCaller: ShortCallerEncoder # ShortCallerEncoder FullCallerEncoder default is FullCallerEncoder
+
+mysql_clients:
+  - name: default
+    open_log: true
+    username: golang
+    password: 123456
+    host: localhost:35011
+    dbname: basic
+    config: charset=utf8&parseTime=True&loc=UTC
+    max_idle_conns: 10
+    max_open_conns: 100
+    conn_max_lifetime: 0
+
+redis_clients:
+  - name: default
+    addr: localhost:35021
+    password:
+    db: 0
+    max_retries: 0 # Default is to not retry failed commands
+    dial_timeout: 5 # Default is 5 seconds.
+    read_timeout: 3 # Default is 3 seconds.
+    write_timeout: 3 # Default is ReadTimeout
+
+monitor: # monitor
+  status: true             # api status use {monitor.health}
+  health: /status/health   # api health
+  retryCount: 10           # ping api health retry count
+  hardware: true           # hardware true or false
+  status_hardware:
+    disk: /status/hardware/disk     # hardware api disk
+    cpu: /status/hardware/cpu       # hardware api cpu
+    ram: /status/hardware/ram       # hardware api ram
+  debug: true                       # debug true or false
+  pprof: true                       # security true or false
+  security: false                    # debug and security security true or false
+  securityUser:
+    admin: 56a37774c69bd40a1b3e540a3ac8900e # admin:pwd
