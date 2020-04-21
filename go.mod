@@ -10,6 +10,8 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.6.3
 	github.com/stretchr/testify v1.5.1
+	github.com/willf/bitset v1.1.10 // indirect
+	github.com/willf/bloom v2.0.3+incompatible
 	go.uber.org/zap v1.14.1
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
