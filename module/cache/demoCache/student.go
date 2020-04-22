@@ -1,7 +1,7 @@
 package demoCache
 
 import (
-	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache"
+	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optDefault"
 	"github.com/bridgewwater/golang-project-temple-docker-db/module/demo"
 	"time"
 )
@@ -13,16 +13,13 @@ const (
 )
 
 func ExistsStudent(key string) (bool, error) {
-	return cache.RedisDefault(false).
-		RedisDefaultExists(key, cpStudentPrefix)
+	return optDefault.Opt().Exists(key, cpStudentPrefix)
 }
 
 func Set(key string, data *demo.Student) error {
-	return cache.RedisDefault(false).
-		RedisDefaultSet(key, cpStudentPrefix, data, cpStudentExpiration)
+	return optDefault.Opt().SetJson(key, cpStudentPrefix, data, cpStudentExpiration)
 }
 
 func Get(key string, data *demo.Student) error {
-	return cache.RedisDefault(false).
-		RedisDefaultGet(key, cpStudentPrefix, data)
+	return optDefault.Opt().GetJson(key, cpStudentPrefix, data)
 }

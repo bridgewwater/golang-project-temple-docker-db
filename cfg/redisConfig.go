@@ -13,9 +13,9 @@ type RedisClient struct {
 
 func RedisClientByName(name string) RedisClient {
 	conf := *global
-	for _, client := range conf.RedisClients {
+	for _, client := range conf.RedisOptConfig {
 		if client.Name == name {
-			return client
+			return RedisClient{}
 		}
 	}
 	return RedisClient{}

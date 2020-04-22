@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/bridgewwater/golang-project-temple-docker-db/cfg"
 	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache"
-	"github.com/bridgewwater/golang-project-temple-docker-db/pkg/zlog"
 	"github.com/sinlovgo/timezone"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -14,6 +13,10 @@ import (
 	"testing"
 	"time"
 )
+
+func initRedisDefault() error {
+	return cache.InitRedisOpt()
+}
 
 func TestMain(m *testing.M) {
 	// setup
@@ -28,15 +31,6 @@ func TestMain(m *testing.M) {
 
 	os.Exit(m.Run())
 	// teardown
-}
-
-func initRedisDefault() error {
-	_, err := cache.InitRedisDefault()
-	if err != nil {
-		zlog.S().Errorf("InitRedisDefault err: %v", err)
-		return err
-	}
-	return nil
 }
 
 func initConfigByViper() error {

@@ -1,4 +1,4 @@
-package demoCache
+package demoCache_test
 
 import (
 	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/demoCache"
