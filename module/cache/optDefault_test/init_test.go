@@ -14,23 +14,26 @@ import (
 	"time"
 )
 
-func initRedisDefault() error {
-	return cache.InitRedisOpt()
-}
-
 func TestMain(m *testing.M) {
 	// setup
+	initOptRedisForTest()
+
+	os.Exit(m.Run())
+	// teardown
+}
+
+func initOptRedisForTest() {
 	err := initConfigByViper()
 	if err != nil {
 		panic(err)
 	}
-
 	if err := initRedisDefault(); err != nil {
 		panic(err)
 	}
+}
 
-	os.Exit(m.Run())
-	// teardown
+func initRedisDefault() error {
+	return cache.InitRedisOpt()
 }
 
 func initConfigByViper() error {

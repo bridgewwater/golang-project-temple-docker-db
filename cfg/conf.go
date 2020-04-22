@@ -1,6 +1,6 @@
 package cfg
 
-import "github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optredis/optredisconfig"
+import "github.com/sinlovgo/optredis/optredisconfig"
 
 type ConfFile struct {
 	ConfigPath   string

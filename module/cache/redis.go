@@ -3,7 +3,7 @@ package cache
 import (
 	"github.com/bridgewwater/golang-project-temple-docker-db/cfg"
 	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optDefault"
-	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optredis"
+	"github.com/sinlovgo/optredis"
 )
 
 func InitRedisOpt() error {
