@@ -3,7 +3,6 @@ package optredis
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/bloomfilter"
 	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optredis/redisconfig"
 	"github.com/go-redis/redis"
 	"github.com/willf/bloom"
@@ -192,7 +191,7 @@ func (o OptRedis) InitByName() OptRedis {
 	})
 
 	if o.UseBoomFilter {
-		o.BloomFilter = bloomfilter.InitRedisFilter(5, 100, 20)
+		o.BloomFilter = initRedisFilter(5, 100, 20)
 	}
 
 	return o
