@@ -1,6 +1,6 @@
-package redisconfig
+package optredisconfig
 
-type RedisConfig struct {
+type Cfg struct {
 	Name         string `json:"name" mapstructure:"name"  yaml:"name" toml:"name"`
 	Addr         string `json:"addr" mapstructure:"addr" yaml:"addr" toml:"addr"`
 	Password     string `json:"password" mapstructure:"password" yaml:"password" toml:"password"`
@@ -11,11 +11,11 @@ type RedisConfig struct {
 	WriteTimeout int    `json:"write_timeout" mapstructure:"write_timeout" yaml:"write_timeout" toml:"write_timeout"`
 }
 
-func ByName(list []RedisConfig, name string) RedisConfig {
+func ByName(list []Cfg, name string) Cfg {
 	for _, client := range list {
 		if client.Name == name {
 			return client
 		}
 	}
-	return RedisConfig{}
+	return Cfg{}
 }

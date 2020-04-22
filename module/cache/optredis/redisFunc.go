@@ -3,7 +3,7 @@ package optredis
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optredis/redisconfig"
+	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optredis/optredisconfig"
 	"github.com/go-redis/redis"
 	"github.com/willf/bloom"
 	"time"
@@ -171,7 +171,7 @@ func (o OptRedis) InitByName() OptRedis {
 	if redisConfigList == nil {
 		panic(errRedisConfigListEmpty)
 	}
-	redisConf := redisconfig.ByName(*redisConfigList, o.Name)
+	redisConf := optredisconfig.ByName(*redisConfigList, o.Name)
 	redisAddr := parseEnvStringOrDefault(parseEnvByName(o.Name, envKeyCacheRedisAddr), redisConf.Addr)
 	redisPassword := parseEnvStringOrDefault(parseEnvByName(o.Name, envKeyCacheRedisPassword), redisConf.Password)
 	redisDB := parseEnvIntOrDefault(parseEnvByName(o.Name, envKeyCacheRedisDB), redisConf.DB)

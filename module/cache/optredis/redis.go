@@ -2,14 +2,24 @@ package optredis
 
 import (
 	"fmt"
-	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optredis/redisconfig"
+	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache/optredis/optredisconfig"
 )
 
-var redisConfigList *[]redisconfig.RedisConfig
+var redisConfigList *[]optredisconfig.Cfg
 
-var errRedisConfigListEmpty = fmt.Errorf("optredis err: redis config list is empty")
+var errRedisConfigListEmpty = fmt.Errorf("optredis err: redis config list is empty, you must use optredis.InitByConfigList()")
 
-func InitByConfigList(redisClientList []redisconfig.RedisConfig) error {
+// init by viper config list as
+//	redis_clients:
+//  - name: default
+//    addr: localhost:6379
+//    password:
+//    db: 0
+//    max_retries: 0 # Default is to not retry failed commands
+//    dial_timeout: 5 # Default is 5 seconds.
+//    read_timeout: 3 # Default is 3 seconds.
+//    write_timeout: 3 # Default is ReadTimeout
+func InitByConfigList(redisClientList []optredisconfig.Cfg) error {
 	if redisClientList == nil {
 		return errRedisConfigListEmpty
 	}
