@@ -23,6 +23,7 @@ type OptRedis struct {
 	errClientNotInit error
 	errKeyEmpty      error
 	errKeyFilter     error
+	errKeyNotExist   error
 	errDataEmpty     error
 }
 
@@ -32,13 +33,72 @@ func (o OptRedis) Exists(key string, prefix string) (bool, error) {
 	}
 	totalKey := fmt.Sprintf("%v%v", prefix, key)
 	if o.UseBoomFilter {
-		if o.BloomFilter.TestString(totalKey) {
-			return ExistsKey(o.RedisClient, totalKey)
-		} else {
-			return false, nil
+		if !o.BloomFilter.TestString(totalKey) {
+			return false, o.errKeyFilter
 		}
 	}
 	return ExistsKey(o.RedisClient, totalKey)
+}
+
+func (o OptRedis) Del(key string, prefix string) (int64, error) {
+	if key == "" {
+		return 0, o.errKeyEmpty
+	}
+	totalKey := fmt.Sprintf("%v%v", prefix, key)
+	return o.RedisClient.Del(totalKey).Result()
+}
+
+func (o OptRedis) TTL(key string, prefix string) (time.Duration, error) {
+	if key == "" {
+		return 0, o.errKeyEmpty
+	}
+	totalKey := fmt.Sprintf("%v%v", prefix, key)
+	if o.UseBoomFilter {
+		if !o.BloomFilter.TestString(totalKey) {
+			return 0, o.errKeyFilter
+		}
+	}
+	existCount, err := o.RedisClient.Exists(totalKey).Result()
+	if err != nil {
+		return 0, err
+	}
+	if existCount == 0 {
+		return 0, o.errKeyNotExist
+	}
+	return o.RedisClient.TTL(totalKey).Result()
+}
+
+func (o OptRedis) Expire(key string, prefix string, exp time.Duration) (bool, error) {
+	if key == "" {
+		return false, o.errKeyEmpty
+	}
+	totalKey := fmt.Sprintf("%v%v", prefix, key)
+	if o.UseBoomFilter {
+		if !o.BloomFilter.TestString(totalKey) {
+			return false, o.errKeyFilter
+		}
+	}
+	existCount, err := o.RedisClient.Exists(totalKey).Result()
+	if err != nil {
+		return false, err
+	}
+	if existCount == 0 {
+		return false, o.errKeyNotExist
+	}
+	return o.RedisClient.Expire(totalKey, exp).Result()
+}
+
+func (o OptRedis) Persist(key string, prefix string) (bool, error) {
+	if key == "" {
+		return false, o.errKeyEmpty
+	}
+	totalKey := fmt.Sprintf("%v%v", prefix, key)
+	if o.UseBoomFilter {
+		if !o.BloomFilter.TestString(totalKey) {
+			return false, o.errKeyFilter
+		}
+	}
+	return o.RedisClient.Persist(key).Result()
 }
 
 func (o OptRedis) SetJson(key string, prefix string, data interface{}, expiration time.Duration) error {
@@ -131,7 +191,9 @@ func (o OptRedis) InitByName() OptRedis {
 		WriteTimeout: time.Duration(redisWriteTimeout) * time.Second,
 	})
 
-	o.BloomFilter = bloomfilter.InitRedisFilter(5, 100, 20)
+	if o.UseBoomFilter {
+		o.BloomFilter = bloomfilter.InitRedisFilter(5, 100, 20)
+	}
 
 	return o
 }
@@ -141,6 +203,10 @@ type RedisFunc interface {
 	Ping() (OptRedis, error)
 	Client() *redis.Client
 	Exists(key string, prefix string) (bool, error)
+	Del(key string, prefix string) (int64, error)
+	TTL(key string, prefix string) (time.Duration, error)
+	Expire(key string, prefix string, exp time.Duration) (bool, error)
+	Persist(key string, prefix string) (bool, error)
 	SetJson(key string, prefix string, data interface{}, expiration time.Duration) error
 	GetJson(key string, prefix string, v interface{}) error
 }
@@ -153,6 +219,7 @@ func NewOptRedis(cfg Config) RedisFunc {
 		errClientNotInit: fmt.Errorf("%v opt redis : client empty, must be init", cfg.Name),
 		errKeyEmpty:      fmt.Errorf("%v opt redis : key is empty plase check", cfg.Name),
 		errKeyFilter:     fmt.Errorf("%v opt redis : key filtered", cfg.Name),
+		errKeyNotExist:   fmt.Errorf("%v opt redis : key not exist", cfg.Name),
 		errDataEmpty:     fmt.Errorf("%v opt redis : data is empty", cfg.Name),
 	}
 }

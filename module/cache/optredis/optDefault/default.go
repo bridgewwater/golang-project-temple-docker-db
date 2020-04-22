@@ -23,6 +23,9 @@ func Init() error {
 		}
 		defaultOptRedis = &optRedis
 	}
-
 	return nil
+}
+
+func Opt() *optredis.OptRedis {
+	return defaultOptRedis
 }
