@@ -1,9 +1,9 @@
-package demoCache_test
+package optDefault_test
 
 import (
 	"fmt"
 	"github.com/bridgewwater/golang-project-temple-docker-db/cfg"
-	"github.com/bridgewwater/golang-project-temple-docker-db/module/cache"
+	"github.com/bridgewwater/golang-project-temple-docker-db/module/dbmysql"
 	"github.com/sinlovgo/timezone"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -15,10 +15,10 @@ import (
 )
 
 func initBiz() error {
-	return cache.InitRedisOpt()
+	return dbmysql.InitMySQLOpt()
 }
 
-func initOptRedisForTest() {
+func initConfigForTest() {
 	err := initConfigByViper()
 	if err != nil {
 		panic(err)
@@ -59,7 +59,7 @@ func pathCallUpperLevel(level int) string {
 
 func TestMain(m *testing.M) {
 	// setup
-	initOptRedisForTest()
+	initConfigForTest()
 
 	os.Exit(m.Run())
 	// teardown

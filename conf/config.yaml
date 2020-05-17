@@ -33,10 +33,10 @@ zap:
 mysql_clients:
   - name: default
     open_log: true
-    username: golang
-    password: 123456
     host: localhost:35011
-    dbname: basic
+    db_name: GoAdmin
+    username: golang
+    password: golang123456
     config: charset=utf8&parseTime=True&loc=UTC
     max_idle_conns: 10
     max_open_conns: 100

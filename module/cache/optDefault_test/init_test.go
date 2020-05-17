@@ -14,12 +14,8 @@ import (
 	"time"
 )
 
-func TestMain(m *testing.M) {
-	// setup
-	initOptRedisForTest()
-
-	os.Exit(m.Run())
-	// teardown
+func initBiz() error {
+	return cache.InitRedisOpt()
 }
 
 func initOptRedisForTest() {
@@ -27,13 +23,9 @@ func initOptRedisForTest() {
 	if err != nil {
 		panic(err)
 	}
-	if err := initRedisDefault(); err != nil {
+	if err := initBiz(); err != nil {
 		panic(err)
 	}
-}
-
-func initRedisDefault() error {
-	return cache.InitRedisOpt()
 }
 
 func initConfigByViper() error {
@@ -63,4 +55,12 @@ func pathCallUpperLevel(level int) string {
 		res = dir
 	}
 	return res
+}
+
+func TestMain(m *testing.M) {
+	// setup
+	initOptRedisForTest()
+
+	os.Exit(m.Run())
+	// teardown
 }

@@ -6,6 +6,8 @@ require (
 	github.com/bxcodec/faker/v3 v3.3.1
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-redis/redis v6.15.7+incompatible // indirect
+	github.com/go-sql-driver/mysql v1.4.1
+	github.com/jinzhu/gorm v1.9.12
 	github.com/sinlovgo/optredis v0.1.1
 	github.com/sinlovgo/timezone v1.1.1
 	github.com/spf13/pflag v1.0.5

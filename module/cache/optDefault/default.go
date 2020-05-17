@@ -11,7 +11,7 @@ var defaultOptRedis *optredis.OptRedis
 func Init() error {
 	if defaultOptRedis == nil {
 		config := optredis.NewConfig(
-			optredis.WithName("default"),
+			optredis.WithName(name),
 		)
 		optRedis, err := optredis.NewOptRedis(*config).InitByName().Ping()
 		if err != nil {
